@@ -26,3 +26,8 @@ class HaarWaveletTransform(nn.Module):
             return self.dwt_1d(x)
         else:
             return self.dwt_2d(x)
+
+    def dwt_1d(self, x: torch.Tensor) -> torch.Tensor:
+        low = F.conv1d(x, self.h, stride=2)
+        high = F.conv1d(x, self.g, stride=2)
+        return low, high

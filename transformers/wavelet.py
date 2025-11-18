@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from pyspark.sql.connect.functions import hll_sketch_agg
+
 
 class HaarWaveletTransform(nn.Module):
     """
@@ -31,3 +33,14 @@ class HaarWaveletTransform(nn.Module):
         low = F.conv1d(x, self.h, stride=2)
         high = F.conv1d(x, self.g, stride=2)
         return low, high
+
+    def dwt_2d(self, x: torch.Tensor) -> torch.Tensor:
+        low_w = F.conv2d(x, self.h.unsqueeze(2), stride=(1, 2))
+        high_w = F.conv2d(x, self.g.unsqueeze(2), stride=(1, 2))
+
+        ll = F.conv2d(low_w, self.h.unsqueeze(3), stride=(2, 1))
+        lh = F.conv2d(low_w, self.g.unsqueeze(3), stride=(2, 1))
+        hl = F.conv2d(high_w, self.h.unsqueeze(3), stride=(2, 1))
+        hh = F.conv2d(high_w, self.g.unsqueeze(3), stride=(2, 1))
+
+        return ll, lh, hl, hh

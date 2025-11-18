@@ -20,3 +20,9 @@ class HaarWaveletTransform(nn.Module):
 
         self.register_buffer('h', h.view(1, 1, -1))
         self.register_buffer('g', g.view(1, 1, -1))
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.mode == '1d':
+            return self.dwt_1d(x)
+        else:
+            return self.dwt_2d(x)
